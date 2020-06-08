@@ -1,13 +1,12 @@
 package com.devkproject.daggepractice.di
 
-import com.devkproject.daggepractice.AuthActivity
+import com.devkproject.daggepractice.MainActivity
 import dagger.Module
-import dagger.Provides
 import dagger.android.ContributesAndroidInjector
 
 @Module
 abstract class ActivityBuildersModule {
 
     @ContributesAndroidInjector
-    abstract fun contributeAuthActivity(): AuthActivity
+    abstract fun contributeAuthActivity(): MainActivity
 }

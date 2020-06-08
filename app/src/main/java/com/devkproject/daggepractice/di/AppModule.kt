@@ -35,23 +35,5 @@ class AppModule {
         fun provideDrawable(application: Application): Drawable? {
             return ContextCompat.getDrawable(application, R.drawable.logo)
         }
-
-//        @JvmStatic
-//        @Provides
-//        fun someString(): String {
-//            return "this is a test string"
-//        }
-
-//        @JvmStatic
-//        @Provides
-//        fun getApp(application: Application): Boolean {
-//            return false
-//        }
-
-//        @JvmStatic
-//        @Provides
-//        fun someInt(string: String): Int {
-//            return if(string == "this is a test string") 1 else 0
-//        }
     }
 }
