@@ -9,7 +9,11 @@ import dagger.android.AndroidInjector
 
 
 @Component(
-    modules = [AndroidInjectionModule::class, ActivityBuildersModule::class, AppModule::class]
+    modules = [
+        AndroidInjectionModule::class,
+        ActivityBuildersModule::class,
+        AppModule::class,
+        ViewModelFactoryModule::class]
 )
 
 interface AppComponent: AndroidInjector<BaseApplication> {

@@ -16,7 +16,7 @@
         android:layout_height="150dp"
         android:id="@+id/login_logo"
         android:layout_marginTop="16dp"/>
-    
+
     <com.google.android.material.textfield.TextInputEditText
         app:layout_constraintTop_toBottomOf="@+id/login_logo"
         app:layout_constraintLeft_toLeftOf="parent"
