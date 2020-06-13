@@ -1,6 +1,9 @@
 package com.devkproject.daggepractice.ui.auth
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.LiveDataReactiveStreams
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import com.devkproject.daggepractice.models.User
 import com.devkproject.daggepractice.network.auth.AuthApi
@@ -11,10 +14,14 @@ import javax.inject.Inject
 
 class AuthViewModel
 @Inject
-constructor(authApi: AuthApi) : ViewModel() {
+constructor(private val authApi: AuthApi) : ViewModel() {
+
+    private val authUser = MediatorLiveData<User>()
+
     companion object {
         const val TAG = "AuthViewModel"
     }
+
     init {
         Log.d(TAG, "AuthViewModel: viewmodel is working...")
         authApi.getUser(1)
@@ -33,5 +40,20 @@ constructor(authApi: AuthApi) : ViewModel() {
                     Log.e(TAG, "onError: $e")
                 }
             })
+    }
+
+    fun authenticateWithId(userId: Int) {
+        val source = LiveDataReactiveStreams.fromPublisher(
+            authApi.getUser(userId)
+                .subscribeOn(Schedulers.io())
+        )
+        authUser.addSource(source) { t ->
+            authUser.value = t
+            authUser.removeSource(source)
+        }
+    }
+
+    fun observerUser(): LiveData<User> {
+        return authUser
     }
 }
