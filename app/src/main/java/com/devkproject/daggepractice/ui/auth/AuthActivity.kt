@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.RequestManager
@@ -42,11 +43,35 @@ class AuthActivity : DaggerAppCompatActivity(), View.OnClickListener {
     }
 
     private fun subscribeObservers() {
-        viewModel.observerUser().observe(this, Observer<User> { t ->
+        viewModel.observeUser().observe(this, Observer { t ->
                 if (t != null) {
-                    Log.d("AuthActivity", "onChanged: ${t.email}")
+                    when(t.status) {
+                        AuthResource.AuthStatus.LOADING -> {
+                            showProgressBar(true)
+                        }
+                        AuthResource.AuthStatus.AUTHENTICATED -> {
+                            showProgressBar(false)
+                            Log.d("AuthActivity", "onChanged: LOGIN SUCCESS: ${t.data!!.email}")
+                        }
+                        AuthResource.AuthStatus.ERROR -> {
+                            showProgressBar(false)
+                            Toast.makeText(this, "$t.message \nDid you enter a number between 1 and 10?", Toast.LENGTH_LONG).show()
+                        }
+                        AuthResource.AuthStatus.NOT_AUTHENTICATED -> {
+                            showProgressBar(false)
+                        }
+                    }
                 }
             })
+    }
+
+    private fun showProgressBar(isVisible: Boolean) {
+        if(isVisible) {
+            progress_bar.visibility = View.VISIBLE
+        }
+        else {
+            progress_bar.visibility = View.GONE
+        }
     }
 
     private fun setLogo() {
@@ -67,6 +92,6 @@ class AuthActivity : DaggerAppCompatActivity(), View.OnClickListener {
         if(TextUtils.isEmpty(user_id_input.text.toString())) {
             return
         }
-        viewModel.authenticateWithId(Integer.parseInt(user_id_input.text.toString()))
+        viewModel.authenticateUser(Integer.parseInt(user_id_input.text.toString()))
     }
 }
