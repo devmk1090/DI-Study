@@ -1,42 +1,46 @@
 package com.devkproject.daggepractice.ui.auth
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
+import com.devkproject.daggepractice.SessionManager
 import com.devkproject.daggepractice.models.User
 import com.devkproject.daggepractice.network.auth.AuthApi
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 
-class AuthViewModel @Inject constructor(private val authApi: AuthApi) : ViewModel() {
+class AuthViewModel @Inject constructor(
+    private val authApi: AuthApi,
+    private var sessionManager: SessionManager
+) : ViewModel() {
 
-    private val TAG: String = "AuthViewModel"
-    private var authUser: MediatorLiveData<AuthResource<out User>> = MediatorLiveData()
+    companion object {
+        const val TAG = "AuthViewModel"
+    }
 
-    fun authenticateUser(userID: Int) {
-        authUser.value = AuthResource.Loading(null)
+    fun authenticatedUser(userId: Int) {
+        Log.d(TAG, "Attempting to authenticated the user......")
+        sessionManager.authenticatedWithId(queryUserId(userId))
+    }
 
-        val source: LiveData<AuthResource<out User>> = LiveDataReactiveStreams.fromPublisher(
-            authApi.getUser(userID).onErrorReturn {
+    private fun queryUserId(userId: Int): LiveData<AuthResource<out User>> {
+        return LiveDataReactiveStreams.fromPublisher(
+            authApi.getUser(userId).onErrorReturn{
+                Log.d(TAG, "user auth error seems to be ${it.message}")
                 return@onErrorReturn User(-1, null, null, null)
             }.map {
                 if (it.id == -1) {
-                    return@map AuthResource.Error("Could not authenticate", null)
-                } else {
-                    return@map AuthResource.Authenticated(it)
-                }
+                return@map AuthResource.Error("Could not authenticate", null)
+            } else {
+                return@map  AuthResource.Authenticated(it)
+            }
             }.subscribeOn(Schedulers.io())
         )
-
-        authUser.addSource(source) {
-            authUser.value = it
-            authUser.removeSource(source)
-        }
     }
 
-    fun observeUser(): LiveData<AuthResource<out User>> {
-        return authUser
+    fun observeAuthState(): LiveData<AuthResource<out User>> {
+        return sessionManager.getAuthUser()
     }
 }

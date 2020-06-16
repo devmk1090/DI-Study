@@ -1,5 +1,6 @@
 package com.devkproject.daggepractice.ui.auth
 
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.TextUtils
@@ -10,7 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.RequestManager
 import com.devkproject.daggepractice.R
-import com.devkproject.daggepractice.models.User
+import com.devkproject.daggepractice.ui.main.MainActivity
 import com.devkproject.daggepractice.viewmodels.ViewModelProviderFactory
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_auth.*
@@ -43,7 +44,7 @@ class AuthActivity : DaggerAppCompatActivity(), View.OnClickListener {
     }
 
     private fun subscribeObservers() {
-        viewModel.observeUser().observe(this, Observer { t ->
+        viewModel.observeAuthState().observe(this, Observer { t ->
                 if (t != null) {
                     when(t.status) {
                         AuthResource.AuthStatus.LOADING -> {
@@ -52,6 +53,7 @@ class AuthActivity : DaggerAppCompatActivity(), View.OnClickListener {
                         AuthResource.AuthStatus.AUTHENTICATED -> {
                             showProgressBar(false)
                             Log.d("AuthActivity", "onChanged: LOGIN SUCCESS: ${t.data!!.email}")
+                            onLoginSuccess()
                         }
                         AuthResource.AuthStatus.ERROR -> {
                             showProgressBar(false)
@@ -63,6 +65,11 @@ class AuthActivity : DaggerAppCompatActivity(), View.OnClickListener {
                     }
                 }
             })
+    }
+
+    private fun onLoginSuccess() {
+        intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
     }
 
     private fun showProgressBar(isVisible: Boolean) {
@@ -92,6 +99,6 @@ class AuthActivity : DaggerAppCompatActivity(), View.OnClickListener {
         if(TextUtils.isEmpty(user_id_input.text.toString())) {
             return
         }
-        viewModel.authenticateUser(Integer.parseInt(user_id_input.text.toString()))
+        viewModel.authenticatedUser(Integer.parseInt(user_id_input.text.toString()))
     }
 }

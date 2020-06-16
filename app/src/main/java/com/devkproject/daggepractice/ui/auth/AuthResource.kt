@@ -8,10 +8,10 @@ sealed class AuthResource<T>(
     class Authenticated<T>(data: T) :
         AuthResource<T>(AuthStatus.AUTHENTICATED, data, null)
 
-    class Error<T>(message: String, data: T?) :
+    class Error<T>(message: String, data: T? = null) :
         AuthResource<T>(AuthStatus.ERROR, data, message)
 
-    class Loading<T>(data: T?) :
+    class Loading<T>(data: T? = null) :
         AuthResource<T>(AuthStatus.LOADING, data, null)
 
     class Logout<T>() :

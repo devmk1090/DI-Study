@@ -2,6 +2,7 @@ package com.devkproject.daggepractice.di
 
 import android.app.Application
 import com.devkproject.daggepractice.BaseApplication
+import com.devkproject.daggepractice.SessionManager
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjectionModule
@@ -18,6 +19,9 @@ import javax.inject.Singleton
 )
 
 interface AppComponent: AndroidInjector<BaseApplication> {
+
+    val sessionManager: SessionManager
+        get() = SessionManager()
 
     @Component.Builder
     interface Builder {
